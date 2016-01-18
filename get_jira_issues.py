@@ -23,4 +23,10 @@ jira = JIRA(
                                      ' saved in the config file: '+cfg.cfgFile+'): ')))
 
 
-print(jira.current_user())
+issues_mj = jira.search_issues('"Mantis ID" is not EMPTY')
+
+for i in issues_mj:
+	mantis_id = i.fields.customfield_10605
+	if "http://192.168.132.59/mantis/view.php?" in mantis_id:
+		mantis_id = mantis_id[mantis_id.find("?id=")+4:]
+	print("Jira: {} → Mantis: {}".format(i.key, mantis_id))
