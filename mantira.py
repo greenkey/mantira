@@ -71,7 +71,6 @@ def getJiraIncoherents(jira,cfg):
 
         else:
             print("Status {} not recognized".format(status))
-        pass
 
 
 if __name__ == '__main__':
