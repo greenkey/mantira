@@ -28,8 +28,9 @@ if __name__ == '__main__':
     available_actions = {
         "get_jira_issues": getJiraMantisIssues
     }
-    if args.action not in ('get_jira_issues'):
+    if args.action not in available_actions:
         print("Action {} not available.\nList of available actions: {}".format(args.action,list(available_actions.keys())))
+        exit()
 
     # get configuration
     cfg = confman.Confman(cfgFile=args.config_file, autoask=True, autosave=True)
