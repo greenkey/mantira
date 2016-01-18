@@ -12,6 +12,17 @@ def getJiraMantisIssues(jira,cfg):
             mantis_id = mantis_id[mantis_id.find("?id=")+4:]
         print("Jira: {} → Mantis: {}".format(i.key, mantis_id))
 
+def watchAssignedIssues(jira,cfg):
+    issues = jira.search_issues('assignee = currentUser()')
+    for i in issues:
+        try:
+            parent_issue = jira.issue(i.fields.parent.key)
+            if not parent_issue.fields.watches.isWatching:
+                print("Adding watch on {}".format( parent_issue.key ))
+                jira.add_watcher(parent_issue,jira.current_user())
+        except(AttributeError):
+            print("Error, maybe issue {} doesn't have a parent.".format( i.key ))
+
 
 if __name__ == '__main__':
         
@@ -26,7 +37,8 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     available_actions = {
-        "get_jira_issues": getJiraMantisIssues
+        "get_jira_issues": getJiraMantisIssues,
+        "watch_assigned_issues": watchAssignedIssues
     }
     if args.action not in available_actions:
         print("Action {} not available.\nList of available actions: {}".format(args.action,list(available_actions.keys())))
