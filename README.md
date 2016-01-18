@@ -9,9 +9,9 @@ use redmine from CLI
 #install python and virtualenv
 git clone --recursive <url>
 cd mantira
-virtualenv venv
-virtualenv -p python3 venv
-source venv/bin/activate
+virtualenv env
+virtualenv -p python3 env
+source env/bin/activate
 pip install -r requirements.txt
 
 python import_issues.py <filename>.csv
