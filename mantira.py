@@ -5,7 +5,8 @@ from urllib.parse import urlparse
 from util.mantis import Mantis
 
 def getJiraMantisIssues(jira,mantis,cfg):
-    issues_mj = jira.search_issues('"Mantis ID" is not EMPTY', maxResults=None)
+    dt_str = cfg.get('Mantira','last_check')
+    issues_mj = jira.search_issues('"Mantis ID" is not EMPTY AND status changed AFTER "{}"'.format(dt_str), maxResults=None)
 
     for i in issues_mj:
         mantis_id = i.fields.customfield_10605
@@ -14,7 +15,9 @@ def getJiraMantisIssues(jira,mantis,cfg):
         print("Jira: {} → Mantis: {}".format(i.key, mantis_id))
 
 def watchAssignedIssues(jira,mantis,cfg):
-    issues = jira.search_issues('assignee = currentUser()', maxResults=None)
+    dt_str = cfg.get('Mantira','last_check')
+
+    issues = jira.search_issues('assignee = currentUser() AND status changed AFTER "{}"'.format(dt_str), maxResults=None)
     for i in issues:
         try:
             parent_issue = jira.issue(i.fields.parent.key)
@@ -25,18 +28,14 @@ def watchAssignedIssues(jira,mantis,cfg):
             print("Error, maybe issue {} doesn't have a parent.".format( i.key ))
 
 def getJiraIncoherents(jira,mantis,cfg):
-    from datetime import date, timedelta
-
-    dt_str = cfg.get('Jira','last_check','Check never performed, insert a date from which filter the issues (YYYY-MM-DD): ')
-    yesterday = date.today() - timedelta(1)
-    cfg.put('Jira', 'last_check', yesterday.strftime("%Y-%m-%d"))
+    dt_str = cfg.get('Mantira','last_check')
 
     print("Checking updates since {}".format(dt_str))
 
     issues = jira.search_issues('status changed AFTER "{}"'.format(dt_str), maxResults=None)
     for i in issues:
         status = i.fields.status.name
-
+        
         if status == 'Closed':
             for subissue in i.fields.subtasks:
                 if subissue.fields.status.name != "Closed":
@@ -71,7 +70,8 @@ def getJiraIncoherents(jira,mantis,cfg):
             pass
 
 def getJiraMantisIncoherents(jira,mantis,cfg):
-    issues_mj = jira.search_issues('"Mantis ID" is not EMPTY', maxResults=None)
+    dt_str = cfg.get('Mantira','last_check')
+    issues_mj = jira.search_issues('"Mantis ID" is not EMPTY AND status changed AFTER "{}"'.format(dt_str), maxResults=None)
 
     for ji in issues_mj:
         mantis_id = ji.fields.customfield_10605
@@ -135,6 +135,12 @@ if __name__ == '__main__':
             cfg.get('Mantis','password','Insert password for Mantis: (it will be'
                                          ' saved in the config file: '+cfg.cfgFile+'): '))
 
+    dt_str = cfg.get('Mantira','last_check','Check never performed, insert a date from which filter the issues (YYYY-MM-DD): ')
+    cfg.put('Mantira', 'last_check', dt_str)
+
     available_actions[args.action](jira=jira,mantis=mantis,cfg=cfg)
 
+    from datetime import date, timedelta
+    yesterday = date.today() - timedelta(1)
+    cfg.put('Mantira', 'last_check', yesterday.strftime("%Y-%m-%d"))
 
