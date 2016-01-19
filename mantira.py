@@ -48,8 +48,8 @@ def getJiraIncoherents(jira,mantis,cfg):
                 issuetype = subissue.fields.issuetype.name
                 if issuetype in ('Dev Task'):
                     if subissue.fields.status.name != "Closed":
-                        print("Issue {} is Testing but has at least a Dev Task not Closed ({})".format(
-                            i.key, subissue.key))
+                        print("Issue {} is {} but has at least a Dev Task not Closed ({})".format(
+                            i.key, status, subissue.key))
 
         elif status == 'In Progress':
             devstatuses = set()
