@@ -12,6 +12,7 @@ __email__ = "coding@loman.it"
 
 
 from suds.client import Client
+import os, sys
 
 class Mantis:
 
@@ -24,12 +25,24 @@ class Mantis:
         self.mc_enum_status()
 
     def __getattr__(self, name):
-        self.lastmethod = getattr(self.client.service, name)
-        return self.genericMethod
+        if name.startswith('mc_'):
+            self.lastmethod = getattr(self.client.service, name)
+            return self.genericMethod
+        else:
+            return super.__getattr__(name)
 
     def genericMethod(self,*args,**kwargs):
         kwargs['username'] = self.username
         kwargs['password'] = self.password
-        return self.lastmethod(*args,**kwargs)
+        try:
+            # prevent printing
+            sys.stdout = open(os.devnull, "w")
+            sys.stderr = open(os.devnull, "w")
+            ret = self.lastmethod(*args,**kwargs)
+            sys.stdout = sys.__stdout__
+            sys.stderr = sys.__stderr__
+            return ret
+        except:
+            raise
 
 
