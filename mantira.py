@@ -5,7 +5,7 @@ from urllib.parse import urlparse
 from util.mantis import Mantis
 
 def getJiraMantisIssues(jira,mantis,cfg):
-    issues_mj = jira.search_issues('"Mantis ID" is not EMPTY')
+    issues_mj = jira.search_issues('"Mantis ID" is not EMPTY', maxResults=None)
 
     for i in issues_mj:
         mantis_id = i.fields.customfield_10605
@@ -14,7 +14,7 @@ def getJiraMantisIssues(jira,mantis,cfg):
         print("Jira: {} → Mantis: {}".format(i.key, mantis_id))
 
 def watchAssignedIssues(jira,mantis,cfg):
-    issues = jira.search_issues('assignee = currentUser()')
+    issues = jira.search_issues('assignee = currentUser()', maxResults=None)
     for i in issues:
         try:
             parent_issue = jira.issue(i.fields.parent.key)
@@ -33,7 +33,7 @@ def getJiraIncoherents(jira,mantis,cfg):
 
     print("Checking updates since {}".format(dt_str))
 
-    issues = jira.search_issues('status changed AFTER "{}"'.format(dt_str))
+    issues = jira.search_issues('status changed AFTER "{}"'.format(dt_str), maxResults=None)
     for i in issues:
         status = i.fields.status.name
 
@@ -71,7 +71,7 @@ def getJiraIncoherents(jira,mantis,cfg):
             pass
 
 def getJiraMantisIncoherents(jira,mantis,cfg):
-    issues_mj = jira.search_issues('"Mantis ID" is not EMPTY')
+    issues_mj = jira.search_issues('"Mantis ID" is not EMPTY', maxResults=None)
 
     for ji in issues_mj:
         mantis_id = ji.fields.customfield_10605
