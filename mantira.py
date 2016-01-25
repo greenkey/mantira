@@ -8,7 +8,7 @@ from util.mantis import Mantis
 
 def getJiraMantisIssues(jira,mantis,cfg):
     dt_str = cfg.get('Mantira','last_check')
-    issues_mj = jira.search_issues('"Mantis ID" is not EMPTY AND status changed AFTER "{}"'.format(dt_str), maxResults=None)
+    issues_mj = jira.search_issues('"Mantis ID" is not EMPTY AND updatedDate > "{}"'.format(dt_str), maxResults=None)
 
     for i in issues_mj:
         mantis_id = i.fields.customfield_10605
@@ -19,7 +19,7 @@ def getJiraMantisIssues(jira,mantis,cfg):
 def watchAssignedIssues(jira,mantis,cfg):
     dt_str = cfg.get('Mantira','last_check')
 
-    issues = jira.search_issues('assignee = currentUser() AND status changed AFTER "{}"'.format(dt_str), maxResults=None)
+    issues = jira.search_issues('assignee = currentUser() AND updatedDate > "{}"'.format(dt_str), maxResults=None)
     for i in issues:
         try:
             parent_issue = jira.issue(i.fields.parent.key)
@@ -34,7 +34,7 @@ def getJiraIncoherents(jira,mantis,cfg):
 
     print("Checking updates since {}".format(dt_str))
 
-    issues = jira.search_issues('status changed AFTER "{}"'.format(dt_str), maxResults=None)
+    issues = jira.search_issues('updatedDate > "{}"'.format(dt_str), maxResults=None)
     for i in issues:
         status = i.fields.status.name
         
@@ -73,7 +73,7 @@ def getJiraIncoherents(jira,mantis,cfg):
 
 def getJiraMantisIncoherents(jira,mantis,cfg):
     dt_str = cfg.get('Mantira','last_check')
-    issues_mj = jira.search_issues('"Mantis ID" is not EMPTY AND status changed AFTER "{}"'.format(dt_str), maxResults=None)
+    issues_mj = jira.search_issues('"Mantis ID" is not EMPTY AND updatedDate > "{}"'.format(dt_str), maxResults=None)
 
     for ji in issues_mj:
         mantis_id = ji.fields.customfield_10605
