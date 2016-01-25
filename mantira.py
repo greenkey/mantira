@@ -1,3 +1,5 @@
+# coding=UTF-8
+
 import argparse, json
 from jira import JIRA
 from util import confman
