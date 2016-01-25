@@ -108,6 +108,10 @@ if __name__ == '__main__':
                        action='store', default='.mantira_config.json',
                        help='Set the config file to use '
                             '(default: .mantira_config.json)')
+    parser.add_argument('--from_date', dest='from_date',
+                       action='store', default='last_check',
+                       help='From which date the analysis should take place, ISO format '
+                            '(default = last check)')
     args = parser.parse_args()
 
     available_actions = {
@@ -137,7 +141,10 @@ if __name__ == '__main__':
             cfg.get('Mantis','password','Insert password for Mantis: (it will be'
                                          ' saved in the config file: '+cfg.cfgFile+'): '))
 
-    dt_str = cfg.get('Mantira','last_check','Check never performed, insert a date from which filter the issues (YYYY-MM-DD): ')
+    if(args.from_date == 'last_check'):
+        dt_str = cfg.get('Mantira','last_check','Check never performed, insert a date from which filter the issues (YYYY-MM-DD): ')
+    else:
+        dt_str = args.from_date
     cfg.put('Mantira', 'last_check', dt_str)
 
     available_actions[args.action](jira=jira,mantis=mantis,cfg=cfg)
